@@ -65,20 +65,6 @@ public class QuanLyChiTieuService {
         return response;
     }
 
-    public BaseResponse updateNote(UpdateNoteRequest request) {
-        BaseResponse response = new BaseResponse();
-        if (request == null || request.isInvalid()) {
-            response.setParamsInvalid();
-            return response;
-        }
-        if (quanLyChiTieuDao.updateNote(request)) {
-            response.setSuccess();
-        } else {
-            response.setFailed("Cập nhật thất bại");
-        }
-        return response;
-    }
-
     public BaseResponse magicSkill(ThongTinCheckInRequest request) throws ParseException {
         GetArrayResponse response = new GetArrayResponse();
         if (request == null || request.isInvalid()) {

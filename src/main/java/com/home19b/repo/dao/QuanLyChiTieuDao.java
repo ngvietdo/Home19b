@@ -70,19 +70,6 @@ public class QuanLyChiTieuDao extends BaseDao {
         return result;
     }
 
-    public boolean updateNote(UpdateNoteRequest request) {
-        Bson condition = Filters.and(
-                Filters.eq("sdt", request.getSdt()),
-                Filters.eq("ngayCheckIn", request.getNgayCheck()),
-                Filters.eq("buoi", request.getBuoi())
-        );
-        Bson valueWillUpdate = new BasicDBObject("$set", new BasicDBObject()
-                .append("ghiChu", request.getNote())
-                .append("soTienChi", request.getSoTienChi()));
-        long result = update(CollectionMongoUtils.CLT_CHECKIN, condition, valueWillUpdate);
-        return result > 0;
-    }
-
     public boolean generatedDay(String ngayMai) {
         Bson condition = Filters.eq("ngayCheckIn", ngayMai);
         Document document = findOne(CollectionMongoUtils.CLT_CHECKIN, condition);

@@ -34,12 +34,6 @@ public class QuanLyChiTieuController {
         return quanLyChiTieuService.getInfoCheckIn(request);
     }
 
-    @PostMapping("/updateNote")
-    @ApiOperation("Cập nhật ghi chú và số tiền chi trong ngày của 1 thằng")
-    public BaseResponse updateNote(@RequestBody UpdateNoteRequest request) {
-        return quanLyChiTieuService.updateNote(request);
-    }
-
     @PostMapping("/magicSkill")
     @ApiOperation("Magiccccccccc Skilllllllllllll")
     public BaseResponse tinhTongChiTieuTungNgay(@RequestBody ThongTinCheckInRequest request) throws ParseException {
@@ -48,7 +42,7 @@ public class QuanLyChiTieuController {
 
     @GetMapping("/generateDay")
     @ApiOperation("gen")
-    public BaseResponse generateDay(){
+    public BaseResponse generateDay() {
         return quanLyChiTieuService.generateDay();
     }
 }
