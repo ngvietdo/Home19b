@@ -1,0 +1,39 @@
+#config server product
+spring:
+  application:
+    name: home19b
+  jackson:
+    date-format: dd/MM/yyyy
+  data:
+    mongodb:
+      database: admin
+      host: 45.76.182.215
+      password: matkhau@default
+      username: admin
+      port: 27017
+server:
+  port: 8686
+  http2:
+    enabled: true
+  compression:
+    enabled: true
+    mime-types: application/json
+    min-response-size: 1024
+
+logging:
+  config: config/log4j2-develop.xml
+
+logbook:
+  format:
+    style: curl
+  exclude:
+    - /v2/api-docs
+    - /actuator/*
+  write:
+    max-body-size: 500
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

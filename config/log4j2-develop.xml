@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="TRACE" monitorInterval="60">
+
+    <Properties>
+        <Property name="projectName">home19b</Property>
+        <Property name="basePath">${sys:user.home}/log/${projectName}</Property>
+        <Property name="defaultPattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%-22.22t] %-30.30c{1} - %msg%n
+        </Property>
+        <Property name="consolePattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%p] %c:%L - %m%n</Property>
+        <Property name="cdr_pattern">%m%n</Property>
+    </Properties>
+
+    <Appenders>
+
+        <RollingFile fileName="${basePath}/${projectName}.log"
+                     filePattern="${basePath}/${projectName}.log-%d{yyyy-MM-dd-HH}.gz" name="MAIN">
+            <PatternLayout pattern="${defaultPattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+
+        <Async name="ASYNC_MAIN">
+            <AppenderRef ref="MAIN"/>
+        </Async>
+
+        <RollingFile fileName="${basePath}/alarm/alarm.log"
+                     filePattern="${basePath}/alarm/alarm.log-%d{yyyy-MM-dd-HHmm}.gz" name="ALARM">
+            <PatternLayout pattern="${defaultPattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile fileName="${basePath}/cdr/cdr.log"
+                     filePattern="${basePath}/cdr/cdr.log-%d{yyyy-MM-dd-HH}" name="CDR_WRITER">
+            <PatternLayout pattern="${cdr_pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+
+        <Async name="ASYNC_ALARM">
+            <AppenderRef ref="ALARM"/>
+        </Async>
+
+        <Async name="ASYNC_CDR_WRITER">
+            <AppenderRef ref="CDR_WRITER"/>
+        </Async>
+
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <PatternLayout pattern="${consolePattern}"/>
+        </Console>
+
+    </Appenders>
+
+    <Loggers>
+        <Logger additivity="false" level="INFO" name="io.lettuce">
+            <appender-ref ref="ASYNC_MAIN"/>
+        </Logger>
+        <Logger additivity="false" level="INFO" name="org.springframework">
+            <appender-ref ref="ASYNC_MAIN"/>
+        </Logger>
+        <Logger additivity="false" level="INFO" name="io.swagger">
+            <appender-ref ref="ASYNC_MAIN"/>
+        </Logger>
+        <Logger additivity="false" level="INFO" name="org.hibernate">
+            <appender-ref ref="ASYNC_MAIN"/>
+        </Logger>
+        <Logger additivity="false" level="INFO" name="com.netflix">
+            <appender-ref ref="ASYNC_MAIN"/>
+        </Logger>
+        <Logger additivity="false" level="INFO" name="org.apache">
+            <appender-ref ref="ASYNC_MAIN"/>
+        </Logger>
+        <Logger additivity="false" level="INFO" name="org.mongodb.driver">
+            <appender-ref ref="ASYNC_MAIN"/>
+        </Logger>
+        <Logger additivity="false" level="INFO" name="com.zaxxer.hikari">
+            <appender-ref ref="ASYNC_MAIN"/>
+        </Logger>
+        <Logger additivity="false" level="INFO" name="org.hibernate.SQL">
+            <appender-ref ref="ASYNC_MAIN"/>
+        </Logger>
+        <Logger additivity="false" level="INFO" name="org.redisson">
+            <appender-ref ref="ASYNC_MAIN"/>
+        </Logger>
+        <Logger additivity="false" level="INFO" name="CDR_WRITER">
+            <appender-ref ref="ASYNC_CDR_WRITER"/>
+        </Logger>
+
+        <Root level="TRACE">
+            <appender-ref ref="ASYNC_MAIN"/>
+            <appender-ref ref="ASYNC_ALARM"/>
+            <!-- development only -->
+             <appender-ref ref="CONSOLE"/>
+        </Root>
+    </Loggers>
+
+</Configuration>
