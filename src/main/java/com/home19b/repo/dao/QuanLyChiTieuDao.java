@@ -48,7 +48,7 @@ public class QuanLyChiTieuDao extends BaseDao {
 
     public List<CheckIn> getInfoCheckIn(ThongTinCheckInRequest request) {
         List<CheckIn> result = new ArrayList<>();
-        getCollection(CollectionMongoUtils.CLT_GHICHU, CheckIn.class)
+        getCollection(CollectionMongoUtils.CLT_CHECKIN, CheckIn.class)
                 .find(Filters.and(
                         Filters.gte("ngayCheckIn", request.getTuNgay()),
                         Filters.lte("ngayCheckIn", request.getDenNgay())

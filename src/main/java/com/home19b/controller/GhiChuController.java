@@ -32,7 +32,7 @@ public class GhiChuController {
     }
 
 
-    @GetMapping("/danhSach")
+    @PostMapping("/danhSach")
     @ApiOperation("Danh Sách ghi chú")
     public GetArrayResponse filterGhiChu(@RequestBody FilterGhiChuRequest request) {
         return quanLyGhiChuService.filterGhiChu(request);
