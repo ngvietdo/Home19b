@@ -23,7 +23,21 @@ public class GhiChuController {
     public BaseResponse createGhiChu(@RequestBody GhiChuRequest request) {
         BaseResponse baseResponse = new BaseResponse();
         if (request.validate()) {
-            quanLyGhiChuService.createGhiChu(request);
+            String id = quanLyGhiChuService.createGhiChu(request);
+            baseResponse.setSuccess();
+            baseResponse.setRd(id);
+        } else {
+            baseResponse.setParamsInvalid();
+        }
+        return baseResponse;
+    }
+
+    @PostMapping("/sua")
+    @ApiOperation("Câp nhật ghi chú")
+    public BaseResponse updateGhiChu(@RequestBody GhiChuRequest request) {
+        BaseResponse baseResponse = new BaseResponse();
+        if (request.validate()) {
+            quanLyGhiChuService.updateGhiChu(request);
             baseResponse.setSuccess();
         } else {
             baseResponse.setParamsInvalid();
@@ -31,10 +45,18 @@ public class GhiChuController {
         return baseResponse;
     }
 
-
     @PostMapping("/danhSach")
     @ApiOperation("Danh Sách ghi chú")
     public GetArrayResponse filterGhiChu(@RequestBody FilterGhiChuRequest request) {
         return quanLyGhiChuService.filterGhiChu(request);
+    }
+
+    @DeleteMapping("/xoa")
+    @ApiOperation("Xóa ghi chú")
+    public BaseResponse deleteGhiChu(@RequestParam String id) {
+        BaseResponse response = new BaseResponse();
+        quanLyGhiChuService.deleteGhiChu(id);
+        response.setSuccess();
+        return response;
     }
 }

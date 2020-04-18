@@ -17,8 +17,8 @@ public class QuanLyGhiChuService {
     QuanLyGhiChuDao quanLyGhiChuDao;
 
 
-    public void createGhiChu(GhiChuRequest request) {
-        quanLyGhiChuDao.createGhiChu(request);
+    public String createGhiChu(GhiChuRequest request) {
+        return quanLyGhiChuDao.createGhiChu(request);
     }
 
     public GetArrayResponse filterGhiChu(FilterGhiChuRequest request) {
@@ -31,5 +31,13 @@ public class QuanLyGhiChuService {
             getArrayResponse.setFailed();
         }
         return getArrayResponse;
+    }
+
+    public void updateGhiChu(GhiChuRequest request) {
+        quanLyGhiChuDao.updateGhiChu(request);
+    }
+
+    public void deleteGhiChu(String id) {
+        quanLyGhiChuDao.delateGhiChu(id);
     }
 }

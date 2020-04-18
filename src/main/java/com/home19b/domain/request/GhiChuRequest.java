@@ -11,6 +11,7 @@ public class GhiChuRequest {
     private String ngayGhiChu;
     private String buoi;
     private Long soTien;
+    private String note;
 
     public boolean validate() {
         if (sdt == null || ngayGhiChu == null || buoi == null || soTien == null || soTien == 0) {
