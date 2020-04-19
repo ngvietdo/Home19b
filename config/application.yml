@@ -8,7 +8,7 @@ spring:
     mongodb:
       database: admin
       host: 45.76.182.215
-      password: matkhau@default
+      password: 3ylqG|lWr8aq07x
       username: admin
       port: 27017
 server:

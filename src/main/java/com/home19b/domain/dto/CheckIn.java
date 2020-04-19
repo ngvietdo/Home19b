@@ -1,8 +1,10 @@
 package com.home19b.domain.dto;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
+@ToString
 public class CheckIn {
     private String sdt;
     private String hoTen;

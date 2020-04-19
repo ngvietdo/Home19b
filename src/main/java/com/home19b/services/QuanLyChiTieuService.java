@@ -24,7 +24,6 @@ import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.validation.constraints.Null;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -82,15 +81,19 @@ public class QuanLyChiTieuService {
             response.setItemNotFound("Không có ngày nào để tính toán cả");
             return response;
         }
+        log.info("result :{}", result);
 
         List<GhiChu> resultGhiChu = quanLyChiTieuDao.getInfoGhiChu(request);
         if (CollectionUtils.isEmpty(resultGhiChu)) {
             response.setItemNotFound("Không có ngày nào để tính toán cả");
             return response;
         }
+        log.info("result ghi chu :{}", resultGhiChu);
 
         LocalDate dateBefore = LocalDate.fromDateFields(AppUtils.parseDate(request.getTuNgay(), AppUtils.DATE_ONLY_PATTERN));
         LocalDate dateAfter = LocalDate.fromDateFields(AppUtils.parseDate(request.getDenNgay(), AppUtils.DATE_ONLY_PATTERN));
+        log.info("date before :{}", AppUtils.formatDate(dateBefore.toDate(), AppUtils.DATE_ONLY_PATTERN));
+        log.info("date after :{}", AppUtils.formatDate(dateAfter.toDate(), AppUtils.DATE_ONLY_PATTERN));
 
         //tinh tổng số tiền chi
         Map<String, Double> mapTongTienTruaChi = new HashMap<>();
@@ -106,17 +109,18 @@ public class QuanLyChiTieuService {
 
         Map<String, ThongTinChiThu> mapFinal = convertListUserTo(quanLyChiTieuDao.findAllUser());
 
-        while (!dateBefore.isEqual(dateAfter)) {
+        while (!dateBefore.isAfter(dateAfter)) {
             String dateCur = AppUtils.formatDate(dateBefore.toDate(), AppUtils.DATE_ONLY_PATTERN);
+            log.info("date cur :{}", dateCur);
             resultGhiChu.stream().forEach(obj -> {
                 if (dateCur.equals(obj.getNgayGhiChu()) && Integer.valueOf(obj.getBuoi()) == CollectionMongoUtils.BUOI_TRUA) {
                     // tinh tổng chi
                     if (mapTongTienTruaChi.containsKey(dateCur)) {
                         Double tongTienTrua = mapTongTienTruaChi.get(dateCur);
-                        tongTienTrua += obj.getSoTienChi();
+                        tongTienTrua += obj.getSoTien();
                         mapTongTienTruaChi.put(dateCur, tongTienTrua);
                     } else {
-                        mapTongTienTruaChi.put(dateCur, obj.getSoTienChi());
+                        mapTongTienTruaChi.put(dateCur, obj.getSoTien());
                     }
 
                     if (mapSoNguoiAnTrongBuaTrua.containsKey(dateCur)) {
@@ -128,12 +132,12 @@ public class QuanLyChiTieuService {
                     if (mapNguoiChiBuoiTrua.containsKey(dateCur)) {
                         ThongTinChiThuTrongNgay tt = new ThongTinChiThuTrongNgay();
                         tt.setSdt(obj.getSdt());
-                        tt.setSoTienChi(obj.getSoTienChi());
+                        tt.setSoTienChi(obj.getSoTien());
                         mapNguoiChiBuoiTrua.get(dateCur).add(tt);
                     } else {
                         ThongTinChiThuTrongNgay tt = new ThongTinChiThuTrongNgay();
                         tt.setSdt(obj.getSdt());
-                        tt.setSoTienChi(obj.getSoTienChi());
+                        tt.setSoTienChi(obj.getSoTien());
                         mapNguoiChiBuoiTrua.put(dateCur, Lists.newArrayList(tt));
                     }
                 }
@@ -141,10 +145,10 @@ public class QuanLyChiTieuService {
                 if (dateCur.equals(obj.getNgayGhiChu()) && Integer.valueOf(obj.getBuoi()) == CollectionMongoUtils.BUOI_TOI) {
                     if (mapTongTienToiChi.containsKey(dateCur)) {
                         Double tongTienTrua = mapTongTienToiChi.get(dateCur);
-                        tongTienTrua += obj.getSoTienChi();
+                        tongTienTrua += obj.getSoTien();
                         mapTongTienToiChi.put(dateCur, tongTienTrua);
                     } else {
-                        mapTongTienToiChi.put(dateCur, obj.getSoTienChi());
+                        mapTongTienToiChi.put(dateCur, obj.getSoTien());
                     }
 
                     if (mapSoNguoiAnTrongBuaToi.containsKey(dateCur)) {
@@ -156,12 +160,12 @@ public class QuanLyChiTieuService {
                     if (mapNguoiChiBuoiToi.containsKey(dateCur)) {
                         ThongTinChiThuTrongNgay tt = new ThongTinChiThuTrongNgay();
                         tt.setSdt(obj.getSdt());
-                        tt.setSoTienChi(obj.getSoTienChi());
+                        tt.setSoTienChi(obj.getSoTien());
                         mapNguoiChiBuoiToi.get(dateCur).add(tt);
                     } else {
                         ThongTinChiThuTrongNgay tt = new ThongTinChiThuTrongNgay();
                         tt.setSdt(obj.getSdt());
-                        tt.setSoTienChi(obj.getSoTienChi());
+                        tt.setSoTienChi(obj.getSoTien());
                         mapNguoiChiBuoiToi.put(dateCur, Lists.newArrayList(tt));
                     }
                 }
@@ -169,27 +173,40 @@ public class QuanLyChiTieuService {
                 if (dateCur.equals(obj.getNgayGhiChu()) && Integer.valueOf(obj.getBuoi()) == CollectionMongoUtils.BUOI_CHUNG) {
                     if (mapTongTienChungChi.containsKey(dateCur)) {
                         Double tongTienTrua = mapTongTienChungChi.get(dateCur);
-                        tongTienTrua += obj.getSoTienChi();
+                        tongTienTrua += obj.getSoTien();
                         mapTongTienChungChi.put(dateCur, tongTienTrua);
                     } else {
-                        mapTongTienChungChi.put(dateCur, obj.getSoTienChi());
+                        mapTongTienChungChi.put(dateCur, obj.getSoTien());
                     }
 
                     if (mapNguoiChiBuoiChung.containsKey(dateCur)) {
                         ThongTinChiThuTrongNgay tt = new ThongTinChiThuTrongNgay();
                         tt.setSdt(obj.getSdt());
-                        tt.setSoTienChi(obj.getSoTienChi());
+                        tt.setSoTienChi(obj.getSoTien());
                         mapNguoiChiBuoiChung.get(dateCur).add(tt);
                     } else {
                         ThongTinChiThuTrongNgay tt = new ThongTinChiThuTrongNgay();
                         tt.setSdt(obj.getSdt());
-                        tt.setSoTienChi(obj.getSoTienChi());
+                        tt.setSoTienChi(obj.getSoTien());
                         mapNguoiChiBuoiChung.put(dateCur, Lists.newArrayList(tt));
                     }
                 }
+                log.info("dda vao day ");
             });
-            dateBefore.plusDays(1);
+            dateBefore = dateBefore.plusDays(1);
         }
+
+        log.info("mapTongTienTruaChi:{}", mapTongTienTruaChi);
+        log.info("mapSoNguoiAnTrongBuaTrua:{}", mapSoNguoiAnTrongBuaTrua);
+        log.info("mapNguoiChiBuoiTrua:{}", mapNguoiChiBuoiTrua);
+        log.info("-----");
+        log.info("mapTongTienToiChi:{}", mapTongTienToiChi);
+        log.info("mapSoNguoiAnTrongBuaToi:{}", mapSoNguoiAnTrongBuaToi);
+        log.info("mapNguoiChiBuoiToi:{}", mapNguoiChiBuoiToi);
+        log.info("-----");
+        log.info("mapTongTienChungChi:{}", mapTongTienChungChi);
+        log.info("mapNguoiChiBuoiChung:{}", mapNguoiChiBuoiChung);
+
 
         // tinh tong tien bua trua cho tung user
         for (Map.Entry<String, Double> entry : mapTongTienTruaChi.entrySet()) {
@@ -214,6 +231,8 @@ public class QuanLyChiTieuService {
             });
         }
 
+        log.info("mapFinal bua trua:{}", mapFinal);
+
         // tinh tong tien bua toi cho tung user
         for (Map.Entry<String, Double> entry : mapTongTienToiChi.entrySet()) {
             String dateCur = entry.getKey();
@@ -237,6 +256,8 @@ public class QuanLyChiTieuService {
             });
         }
 
+        log.info("mapFinal bua toi:{}", mapFinal);
+
         // tinh tong tien bua chung cho tung user
         for (Map.Entry<String, Double> entry : mapTongTienChungChi.entrySet()) {
             String dateCur = entry.getKey();
@@ -257,7 +278,9 @@ public class QuanLyChiTieuService {
             }
         }
 
-        List<ThongTinChiThu> userChiThuList = (List<ThongTinChiThu>) mapFinal.values();
+        log.info("mapFinal bua chung all:{}", mapFinal);
+
+        List<ThongTinChiThu> userChiThuList = new ArrayList<>(mapFinal.values());
         response.setSuccess(userChiThuList, userChiThuList.size());
         return response;
     }

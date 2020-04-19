@@ -7,6 +7,6 @@ public class GhiChu {
     private String sdt;
     private String ngayGhiChu;
     private String buoi; // 0.sang 1.trưa 2.tối 3.chung
-    private Double soTienChi;
+    private Double soTien;
     private String note;
 }
