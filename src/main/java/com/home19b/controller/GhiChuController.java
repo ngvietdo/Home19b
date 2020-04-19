@@ -4,9 +4,11 @@ import com.home19b.domain.request.FilterGhiChuRequest;
 import com.home19b.domain.request.GhiChuRequest;
 import com.home19b.domain.response.BaseResponse;
 import com.home19b.domain.response.GetArrayResponse;
+import com.home19b.domain.response.ItemResponse;
 import com.home19b.services.QuanLyGhiChuService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,13 +22,14 @@ public class GhiChuController {
 
     @PostMapping("/them")
     @ApiOperation("Thêm mới ghi chú")
-    public BaseResponse createGhiChu(@RequestBody GhiChuRequest request) {
-        BaseResponse baseResponse = new BaseResponse();
+    public ItemResponse createGhiChu(@RequestBody GhiChuRequest request) {
+        String id = quanLyGhiChuService.createGhiChu(request);
+        ItemResponse<ObjectId> baseResponse;
         if (request.validate()) {
-            String id = quanLyGhiChuService.createGhiChu(request);
+            baseResponse = baseResponse = new ItemResponse(ItemResponse.Builder.newInstance().setSuccess(id));
             baseResponse.setSuccess();
-            baseResponse.setRd(id);
         } else {
+            baseResponse = new ItemResponse<>(ItemResponse.Builder.newInstance());
             baseResponse.setParamsInvalid();
         }
         return baseResponse;

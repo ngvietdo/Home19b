@@ -27,13 +27,14 @@ public class QuanLyGhiChuDao extends BaseDao {
         document.append("soTien", request.getSoTien());
         document.append("note", request.getNote());
         insertOne(CollectionMongoUtils.CLT_GHICHU, document);
-        String id = document.getObjectId("_id").toString();
+        String id = document.get("_id").toString();
         return id;
     }
 
     public void delateGhiChu(String id) {
         Document document = new Document();
-        document.put("_id", id);
+        ObjectId objectId = new ObjectId(id);
+        document.put("_id", objectId);
         delete(CollectionMongoUtils.CLT_GHICHU, document);
     }
 
@@ -47,25 +48,51 @@ public class QuanLyGhiChuDao extends BaseDao {
             document.append("note", request.getNote());
         }
 
-        Bson condition = Filters.and(
-                Filters.eq("_id", request.getId())
-        );
-        update(CollectionMongoUtils.CLT_GHICHU, condition, document);
+        Document condition = new Document();
+        condition.put("_id", new ObjectId(request.getMa()));
+        update(CollectionMongoUtils.CLT_GHICHU, condition, new Document("$set", document));
     }
 
     public List<GhiChuRequest> filterGhiChu(FilterGhiChuRequest request) {
         List<GhiChuRequest> result = new ArrayList<>();
-        Document requests = (Document) Filters.and(
-                Filters.gte("ngayGhiChu", request.getTuNgay()),
-                Filters.lte("ngayGhiChu", request.getDenNgay())
-        );
-        if (request.getSdt() != null) {
-            requests.put("sdt", request.getSdt());
+        Bson requests;
+        if (request.getSdt() == null) {
+            requests = Filters.and(
+                    Filters.gte("ngayGhiChu", request.getTuNgay()),
+                    Filters.lte("ngayGhiChu", request.getDenNgay())
+            );
+        } else {
+            requests = Filters.and(
+                    Filters.gte("ngayGhiChu", request.getTuNgay()),
+                    Filters.lte("ngayGhiChu", request.getDenNgay()),
+                    Filters.eq("sdt", request.getSdt())
+            );
         }
+
+        log.info("request {}", request);
         getCollection(CollectionMongoUtils.CLT_GHICHU, GhiChuRequest.class)
                 .find(requests).skip(request.getStart()).limit(request.getLimit()).forEach((Block<? super GhiChuRequest>) document -> {
+            document.setMa(document.getId().toString());
+            log.info("document {}", document);
             result.add(document);
         });
         return result;
+    }
+
+    public Long count(FilterGhiChuRequest request) {
+        Bson requests;
+        if (request.getSdt() == null) {
+            requests = Filters.and(
+                    Filters.gte("ngayGhiChu", request.getTuNgay()),
+                    Filters.lte("ngayGhiChu", request.getDenNgay())
+            );
+        } else {
+            requests = Filters.and(
+                    Filters.gte("ngayGhiChu", request.getTuNgay()),
+                    Filters.lte("ngayGhiChu", request.getDenNgay()),
+                    Filters.eq("sdt", request.getSdt())
+            );
+        }
+        return getCollection(CollectionMongoUtils.CLT_GHICHU, GhiChuRequest.class).countDocuments(requests);
     }
 }

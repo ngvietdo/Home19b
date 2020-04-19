@@ -5,6 +5,7 @@ import com.home19b.domain.request.GhiChuRequest;
 import com.home19b.domain.response.BaseResponse;
 import com.home19b.domain.response.GetArrayResponse;
 import com.home19b.repo.dao.QuanLyGhiChuDao;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +27,8 @@ public class QuanLyGhiChuService {
 
         if (!request.isInvalid()) {
             List<GhiChuRequest> ghiChuRequests = quanLyGhiChuDao.filterGhiChu(request);
-            getArrayResponse.setSuccess(ghiChuRequests, ghiChuRequests.size());
-        }else {
+            getArrayResponse.setSuccess(ghiChuRequests, quanLyGhiChuDao.count(request));
+        } else {
             getArrayResponse.setFailed();
         }
         return getArrayResponse;

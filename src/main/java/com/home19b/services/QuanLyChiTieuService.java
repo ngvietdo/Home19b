@@ -1,6 +1,6 @@
 package com.home19b.services;
 
-import com.google.common.base.Strings;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.home19b.common.AppUtils;
@@ -11,16 +11,20 @@ import com.home19b.domain.dto.User;
 import com.home19b.domain.model.ThongTinChiThu;
 import com.home19b.domain.model.ThongTinChiThuTrongNgay;
 import com.home19b.domain.request.CheckInOutRequest;
+import com.home19b.domain.request.FilterGhiChuRequest;
+import com.home19b.domain.request.GhiChuRequest;
 import com.home19b.domain.request.ThongTinCheckInRequest;
-import com.home19b.domain.request.UpdateNoteRequest;
 import com.home19b.domain.response.BaseResponse;
+import com.home19b.domain.response.DetailResponse;
 import com.home19b.domain.response.GetArrayResponse;
 import com.home19b.repo.dao.QuanLyChiTieuDao;
+import com.home19b.repo.dao.QuanLyGhiChuDao;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.validation.constraints.Null;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,9 +33,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class QuanLyChiTieuService {
     final QuanLyChiTieuDao quanLyChiTieuDao;
+    final QuanLyGhiChuDao quanLyGhiChuDao;
 
-    public QuanLyChiTieuService(QuanLyChiTieuDao quanLyChiTieuDao) {
+    public QuanLyChiTieuService(QuanLyChiTieuDao quanLyChiTieuDao, QuanLyGhiChuDao quanLyGhiChuDao) {
         this.quanLyChiTieuDao = quanLyChiTieuDao;
+        this.quanLyGhiChuDao = quanLyGhiChuDao;
     }
 
     public BaseResponse checkInOut(CheckInOutRequest request) {
@@ -103,7 +109,7 @@ public class QuanLyChiTieuService {
         while (!dateBefore.isEqual(dateAfter)) {
             String dateCur = AppUtils.formatDate(dateBefore.toDate(), AppUtils.DATE_ONLY_PATTERN);
             resultGhiChu.stream().forEach(obj -> {
-                if (dateCur.equals(obj.getNgayGhiChu()) && obj.getBuoi() == CollectionMongoUtils.BUOI_TRUA) {
+                if (dateCur.equals(obj.getNgayGhiChu()) && Integer.valueOf(obj.getBuoi()) == CollectionMongoUtils.BUOI_TRUA) {
                     // tinh tổng chi
                     if (mapTongTienTruaChi.containsKey(dateCur)) {
                         Double tongTienTrua = mapTongTienTruaChi.get(dateCur);
@@ -132,7 +138,7 @@ public class QuanLyChiTieuService {
                     }
                 }
 
-                if (dateCur.equals(obj.getNgayGhiChu()) && obj.getBuoi() == CollectionMongoUtils.BUOI_TOI) {
+                if (dateCur.equals(obj.getNgayGhiChu()) && Integer.valueOf(obj.getBuoi()) == CollectionMongoUtils.BUOI_TOI) {
                     if (mapTongTienToiChi.containsKey(dateCur)) {
                         Double tongTienTrua = mapTongTienToiChi.get(dateCur);
                         tongTienTrua += obj.getSoTienChi();
@@ -160,7 +166,7 @@ public class QuanLyChiTieuService {
                     }
                 }
 
-                if (dateCur.equals(obj.getNgayGhiChu()) && obj.getBuoi() == CollectionMongoUtils.BUOI_CHUNG) {
+                if (dateCur.equals(obj.getNgayGhiChu()) && Integer.valueOf(obj.getBuoi()) == CollectionMongoUtils.BUOI_CHUNG) {
                     if (mapTongTienChungChi.containsKey(dateCur)) {
                         Double tongTienTrua = mapTongTienChungChi.get(dateCur);
                         tongTienTrua += obj.getSoTienChi();
@@ -285,5 +291,37 @@ public class QuanLyChiTieuService {
             result.put(obj.getSdt(), new ThongTinChiThu(obj.getSdt(), obj.getHoTen()));
         });
         return result;
+    }
+
+    public List<DetailResponse> detailSreach(FilterGhiChuRequest request) {
+        String sdt = request.getSdt();
+        ThongTinCheckInRequest requestCheckin = new ThongTinCheckInRequest(request.getTuNgay(), request.getDenNgay());
+        List<DetailResponse> responses = new ArrayList<>();
+        request.setSdt(null);
+        List<GhiChuRequest> ghiChuRequests = quanLyGhiChuDao.filterGhiChu(request);
+        List<CheckIn> checkInlist = quanLyChiTieuDao.getInfoCheckIn(requestCheckin);
+        TreeMap<String, DetailResponse> treeMap = new TreeMap<>();
+        TreeMap<String, Integer> soNguoiAnTrongBuoi = new TreeMap<>();
+        for (CheckIn checkIn : checkInlist) {
+            if (checkIn.getIsEat() == 1) {
+                Integer soNguoi = MoreObjects.firstNonNull(soNguoiAnTrongBuoi.get(checkIn.getNgayCheckIn()), 1);
+                soNguoiAnTrongBuoi.put(checkIn.getNgayCheckIn() + checkIn.getBuoi(), soNguoi + 1);
+            }
+        }
+        for (GhiChuRequest ghiChuRequest : ghiChuRequests) {
+            Integer soNguoiAn = MoreObjects.firstNonNull(soNguoiAnTrongBuoi.get(ghiChuRequest.getNgayGhiChu() + ghiChuRequest.getBuoi()), 1);
+            DetailResponse detailResponse = MoreObjects.firstNonNull(treeMap.get(ghiChuRequest.getNgayGhiChu() + ghiChuRequest.getBuoi()), new DetailResponse());
+            detailResponse.setSdt(sdt);
+            detailResponse.setNgay(ghiChuRequest.getNgayGhiChu());
+            detailResponse.setBuoi(ghiChuRequest.getBuoi());
+            if (sdt.equals(ghiChuRequest.getSdt())) {
+                detailResponse.setTongChi(ghiChuRequest.getSoTien() + MoreObjects.firstNonNull(detailResponse.getTongChi(), 0l));
+            }
+            detailResponse.setTongTra(MoreObjects.firstNonNull(detailResponse.getTongTra(), 0l) +
+                    ((soNguoiAn != 0) ? (MoreObjects.firstNonNull(ghiChuRequest.getSoTien(), 0l) / soNguoiAn) : 0)
+            );
+            treeMap.put(ghiChuRequest.getNgayGhiChu() + ghiChuRequest.getBuoi(), detailResponse);
+        }
+        return new ArrayList<>(treeMap.values());
     }
 }

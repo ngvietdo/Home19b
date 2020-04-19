@@ -13,7 +13,7 @@ public class FilterGhiChuRequest {
     private String denNgay;
     private String sdt;
     private Integer start = 0;
-    private Integer limit = 20;
+    private Integer limit = 100;
 
     @JsonIgnore
     public boolean isInvalid() {
