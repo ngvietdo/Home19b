@@ -81,14 +81,14 @@ public class QuanLyChiTieuService {
             response.setItemNotFound("Không có ngày nào để tính toán cả");
             return response;
         }
-        log.info("result :{}", result);
+//        log.info("result :{}", result);
 
         List<GhiChu> resultGhiChu = quanLyChiTieuDao.getInfoGhiChu(request);
         if (CollectionUtils.isEmpty(resultGhiChu)) {
             response.setItemNotFound("Không có ngày nào để tính toán cả");
             return response;
         }
-        log.info("result ghi chu :{}", resultGhiChu);
+//        log.info("result ghi chu :{}", resultGhiChu);
 
         LocalDate dateBefore = LocalDate.fromDateFields(AppUtils.parseDate(request.getTuNgay(), AppUtils.DATE_ONLY_PATTERN));
         LocalDate dateAfter = LocalDate.fromDateFields(AppUtils.parseDate(request.getDenNgay(), AppUtils.DATE_ONLY_PATTERN));
@@ -205,16 +205,16 @@ public class QuanLyChiTieuService {
             dateBefore = dateBefore.plusDays(1);
         }
 
-        log.info("mapTongTienTruaChi:{}", mapTongTienTruaChi);
-        log.info("mapSoNguoiAnTrongBuaTrua:{}", mapSoNguoiAnTrongBuaTrua);
-        log.info("mapNguoiChiBuoiTrua:{}", mapNguoiChiBuoiTrua);
-        log.info("-----");
-        log.info("mapTongTienToiChi:{}", mapTongTienToiChi);
-        log.info("mapSoNguoiAnTrongBuaToi:{}", mapSoNguoiAnTrongBuaToi);
-        log.info("mapNguoiChiBuoiToi:{}", mapNguoiChiBuoiToi);
-        log.info("-----");
-        log.info("mapTongTienChungChi:{}", mapTongTienChungChi);
-        log.info("mapNguoiChiBuoiChung:{}", mapNguoiChiBuoiChung);
+//        log.info("mapTongTienTruaChi:{}", mapTongTienTruaChi);
+//        log.info("mapSoNguoiAnTrongBuaTrua:{}", mapSoNguoiAnTrongBuaTrua);
+//        log.info("mapNguoiChiBuoiTrua:{}", mapNguoiChiBuoiTrua);
+//        log.info("-----");
+//        log.info("mapTongTienToiChi:{}", mapTongTienToiChi);
+//        log.info("mapSoNguoiAnTrongBuaToi:{}", mapSoNguoiAnTrongBuaToi);
+//        log.info("mapNguoiChiBuoiToi:{}", mapNguoiChiBuoiToi);
+//        log.info("-----");
+//        log.info("mapTongTienChungChi:{}", mapTongTienChungChi);
+//        log.info("mapNguoiChiBuoiChung:{}", mapNguoiChiBuoiChung);
 
 
         // tinh tong tien bua trua cho tung user
@@ -232,15 +232,20 @@ public class QuanLyChiTieuService {
             setNguoiAn.forEach(ngAn -> {
                 ThongTinChiThu thongTinChiThu = mapFinal.get(ngAn);
                 thongTinChiThu.setSoTienPhaiDongTrua(thongTinChiThu.getSoTienPhaiDongTrua() + moneyPerPerson);
-                List<ThongTinChiThuTrongNgay> lstTtChiThuTrongNgay = mapNguoiChiBuoiTrua.get(dateCur).stream().filter(ngChi -> ngChi.getSdt().equals(ngAn)).collect(Collectors.toList());
-                lstTtChiThuTrongNgay.forEach(o -> {
-                    thongTinChiThu.setSoTienChiTrua(thongTinChiThu.getSoTienChiTrua() + o.getSoTienChi());
-                });
+//                List<ThongTinChiThuTrongNgay> lstTtChiThuTrongNgay = mapNguoiChiBuoiTrua.get(dateCur).stream().filter(ngChi -> ngChi.getSdt().equals(ngAn)).collect(Collectors.toList());
+//                lstTtChiThuTrongNgay.forEach(o -> {
+//                    thongTinChiThu.setSoTienChiTrua(thongTinChiThu.getSoTienChiTrua() + o.getSoTienChi());
+//                });
                 mapFinal.put(ngAn, thongTinChiThu);
+            });
+            mapNguoiChiBuoiTrua.get(dateCur).forEach(obj -> {
+                ThongTinChiThu thongTinChiThu = mapFinal.get(obj.getSdt());
+                thongTinChiThu.setSoTienChiTrua(thongTinChiThu.getSoTienChiTrua() + obj.getSoTienChi());
+                mapFinal.put(obj.getSdt(), thongTinChiThu);
             });
         }
 
-        log.info("mapFinal bua trua:{}", mapFinal);
+//        log.info("mapFinal bua trua:{}", mapFinal);
 
         // tinh tong tien bua toi cho tung user
         for (Map.Entry<String, Double> entry : mapTongTienToiChi.entrySet()) {
@@ -257,15 +262,20 @@ public class QuanLyChiTieuService {
             setNguoiAn.forEach(ngAn -> {
                 ThongTinChiThu thongTinChiThu = mapFinal.get(ngAn);
                 thongTinChiThu.setSoTienPhaiDongToi(thongTinChiThu.getSoTienPhaiDongToi() + moneyPerPerson);
-                List<ThongTinChiThuTrongNgay> lstTtChiThuTrongNgay = mapNguoiChiBuoiToi.get(dateCur).stream().filter(ngChi -> ngChi.getSdt().equals(ngAn)).collect(Collectors.toList());
-                lstTtChiThuTrongNgay.forEach(o -> {
-                    thongTinChiThu.setSoTienChiToi(thongTinChiThu.getSoTienChiToi() + o.getSoTienChi());
-                });
+//                List<ThongTinChiThuTrongNgay> lstTtChiThuTrongNgay = mapNguoiChiBuoiToi.get(dateCur).stream().filter(ngChi -> ngChi.getSdt().equals(ngAn)).collect(Collectors.toList());
+//                lstTtChiThuTrongNgay.forEach(o -> {
+//                    thongTinChiThu.setSoTienChiToi(thongTinChiThu.getSoTienChiToi() + o.getSoTienChi());
+//                });
                 mapFinal.put(ngAn, thongTinChiThu);
+            });
+            mapNguoiChiBuoiToi.get(dateCur).forEach(obj -> {
+                ThongTinChiThu thongTinChiThu = mapFinal.get(obj.getSdt());
+                thongTinChiThu.setSoTienChiToi(thongTinChiThu.getSoTienChiToi() + obj.getSoTienChi());
+                mapFinal.put(obj.getSdt(), thongTinChiThu);
             });
         }
 
-        log.info("mapFinal bua toi:{}", mapFinal);
+//        log.info("mapFinal bua toi:{}", mapFinal);
 
         // tinh tong tien bua chung cho tung user
         for (Map.Entry<String, Double> entry : mapTongTienChungChi.entrySet()) {
@@ -287,7 +297,7 @@ public class QuanLyChiTieuService {
             }
         }
 
-        log.info("mapFinal bua chung all:{}", mapFinal);
+//        log.info("mapFinal bua chung all:{}", mapFinal);
 
         List<ThongTinChiThu> userChiThuList = new ArrayList<>(mapFinal.values());
         response.setSuccess(userChiThuList, userChiThuList.size());
