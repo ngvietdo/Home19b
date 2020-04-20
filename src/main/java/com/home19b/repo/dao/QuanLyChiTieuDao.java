@@ -98,6 +98,7 @@ public class QuanLyChiTieuDao extends BaseDao {
         document.append("ngayCheckIn", date);
         document.append("buoi", 1);
         document.append("isEat", 0);
+        document.append("chucVuName",user.getChucVuName());
         return document;
     }
 
@@ -108,6 +109,7 @@ public class QuanLyChiTieuDao extends BaseDao {
         document.append("ngayCheckIn", date);
         document.append("buoi", 2);
         document.append("isEat", 1);
+        document.append("chucVuName",user.getChucVuName());
         return document;
     }
 }
