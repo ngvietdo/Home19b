@@ -109,6 +109,27 @@ public class QuanLyChiTieuService {
 
         Map<String, ThongTinChiThu> mapFinal = convertListUserTo(quanLyChiTieuDao.findAllUser());
 
+        // get so ng an trong cac bua
+        result.forEach(obj -> {
+            if (Integer.valueOf(obj.getBuoi()) == CollectionMongoUtils.BUOI_TRUA && obj.getIsEat() == 1) {
+                if (mapSoNguoiAnTrongBuaTrua.containsKey(obj.getNgayCheckIn())) {
+                    mapSoNguoiAnTrongBuaTrua.get(obj.getNgayCheckIn()).add(obj.getSdt());
+                } else {
+                    mapSoNguoiAnTrongBuaTrua.put(obj.getNgayCheckIn(), Sets.newHashSet(obj.getSdt()));
+                }
+            }
+
+            if (Integer.valueOf(obj.getBuoi()) == CollectionMongoUtils.BUOI_TOI && obj.getIsEat() == 1) {
+                if (mapSoNguoiAnTrongBuaToi.containsKey(obj.getNgayCheckIn())) {
+                    mapSoNguoiAnTrongBuaToi.get(obj.getNgayCheckIn()).add(obj.getSdt());
+                } else {
+                    mapSoNguoiAnTrongBuaToi.put(obj.getNgayCheckIn(), Sets.newHashSet(obj.getSdt()));
+                }
+            }
+
+        });
+        //
+
         while (!dateBefore.isAfter(dateAfter)) {
             String dateCur = AppUtils.formatDate(dateBefore.toDate(), AppUtils.DATE_ONLY_PATTERN);
             log.info("date cur :{}", dateCur);
@@ -121,12 +142,6 @@ public class QuanLyChiTieuService {
                         mapTongTienTruaChi.put(dateCur, tongTienTrua);
                     } else {
                         mapTongTienTruaChi.put(dateCur, obj.getSoTien());
-                    }
-
-                    if (mapSoNguoiAnTrongBuaTrua.containsKey(dateCur)) {
-                        mapSoNguoiAnTrongBuaTrua.get(dateCur).add(obj.getSdt());
-                    } else {
-                        mapSoNguoiAnTrongBuaTrua.put(dateCur, Sets.newHashSet(obj.getSdt()));
                     }
 
                     if (mapNguoiChiBuoiTrua.containsKey(dateCur)) {
@@ -149,12 +164,6 @@ public class QuanLyChiTieuService {
                         mapTongTienToiChi.put(dateCur, tongTienTrua);
                     } else {
                         mapTongTienToiChi.put(dateCur, obj.getSoTien());
-                    }
-
-                    if (mapSoNguoiAnTrongBuaToi.containsKey(dateCur)) {
-                        mapSoNguoiAnTrongBuaToi.get(dateCur).add(obj.getSdt());
-                    } else {
-                        mapSoNguoiAnTrongBuaToi.put(dateCur, Sets.newHashSet(obj.getSdt()));
                     }
 
                     if (mapNguoiChiBuoiToi.containsKey(dateCur)) {
