@@ -11,6 +11,7 @@ public class CheckIn {
     private String ngayCheckIn;
     private Integer buoi; // 0.sang 1.trưa 2.tối 3.chung
     private Integer isEat; // 0.0 1. có
+    private String chucVuName;
 //    private Double soTienChi;
 //    private String idTuan;
 //    private String ghiChu;
