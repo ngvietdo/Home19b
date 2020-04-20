@@ -132,7 +132,7 @@ public class QuanLyChiTieuService {
 
         while (!dateBefore.isAfter(dateAfter)) {
             String dateCur = AppUtils.formatDate(dateBefore.toDate(), AppUtils.DATE_ONLY_PATTERN);
-            log.info("date cur :{}", dateCur);
+//            log.info("date cur :{}", dateCur);
             resultGhiChu.stream().forEach(obj -> {
                 if (dateCur.equals(obj.getNgayGhiChu()) && Integer.valueOf(obj.getBuoi()) == CollectionMongoUtils.BUOI_TRUA) {
                     // tinh tổng chi
@@ -200,7 +200,7 @@ public class QuanLyChiTieuService {
                         mapNguoiChiBuoiChung.put(dateCur, Lists.newArrayList(tt));
                     }
                 }
-                log.info("dda vao day ");
+//                log.info("dda vao day ");
             });
             dateBefore = dateBefore.plusDays(1);
         }
