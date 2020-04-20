@@ -300,6 +300,12 @@ public class QuanLyChiTieuService {
 //        log.info("mapFinal bua chung all:{}", mapFinal);
 
         List<ThongTinChiThu> userChiThuList = new ArrayList<>(mapFinal.values());
+        // làm tròn
+        userChiThuList.forEach(obj -> {
+            obj.setSoTienPhaiDongChung(lamTron(obj.getSoTienPhaiDongChung()));
+            obj.setSoTienPhaiDongToi(lamTron(obj.getSoTienPhaiDongToi()));
+            obj.setSoTienPhaiDongTrua(lamTron(obj.getSoTienPhaiDongTrua()));
+        });
         response.setSuccess(userChiThuList, userChiThuList.size());
         return response;
     }
@@ -365,5 +371,19 @@ public class QuanLyChiTieuService {
             treeMap.put(ghiChuRequest.getNgayGhiChu() + ghiChuRequest.getBuoi(), detailResponse);
         }
         return new ArrayList<>(treeMap.values());
+    }
+
+    private Double lamTron(double input) {
+        String value = String.valueOf((int) input);
+        if (value.length() <= 3) {
+            Double val = Double.parseDouble(value);
+            return val < 500 ? 0d : 1000d;
+        }
+        String donViCheck = value.substring(value.length() - 3);
+        String soTienChanBanDau = value.substring(0, value.length() - 3);
+        Integer donViCheckInt = Integer.parseInt(donViCheck);
+        Integer soTienChanBanDauInt = Integer.parseInt(soTienChanBanDau);
+
+        return donViCheckInt < 500 ? soTienChanBanDauInt.doubleValue() * 1000 : soTienChanBanDauInt.doubleValue() * 1000 + 1000;
     }
 }
