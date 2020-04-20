@@ -81,14 +81,14 @@ public class QuanLyChiTieuService {
             response.setItemNotFound("Không có ngày nào để tính toán cả");
             return response;
         }
-//        log.info("result :{}", result);
+        log.info("result :{}", result);
 
         List<GhiChu> resultGhiChu = quanLyChiTieuDao.getInfoGhiChu(request);
         if (CollectionUtils.isEmpty(resultGhiChu)) {
             response.setItemNotFound("Không có ngày nào để tính toán cả");
             return response;
         }
-//        log.info("result ghi chu :{}", resultGhiChu);
+        log.info("result ghi chu :{}", resultGhiChu);
 
         LocalDate dateBefore = LocalDate.fromDateFields(AppUtils.parseDate(request.getTuNgay(), AppUtils.DATE_ONLY_PATTERN));
         LocalDate dateAfter = LocalDate.fromDateFields(AppUtils.parseDate(request.getDenNgay(), AppUtils.DATE_ONLY_PATTERN));
