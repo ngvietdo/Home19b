@@ -31,7 +31,7 @@ public class QuanLyChiTieuController {
 
     @PostMapping("/thongTinCheckIn")
 //    @ApiOperation("Xem thông tin checkIn của cả nhà")
-    public BaseResponse getInfoCheckIn(@RequestBody ThongTinCheckInRequest request) {
+    public BaseResponse getInfoCheckIn(@RequestBody ThongTinCheckInRequest request) throws ParseException {
         return quanLyChiTieuService.getInfoCheckIn(request);
     }
 
@@ -50,7 +50,7 @@ public class QuanLyChiTieuController {
 
     @PostMapping("/chiTietChiNop")
 //    @ApiOperation("Chi Tiết người chi, nộp")
-    public GetArrayResponse detail(FilterGhiChuRequest request) {
+    public GetArrayResponse detail(FilterGhiChuRequest request) throws ParseException {
         GetArrayResponse getArrayResponse = new GetArrayResponse();
         List<DetailResponse> responses = quanLyChiTieuService.detailSreach(request);
         getArrayResponse.setRows(responses);

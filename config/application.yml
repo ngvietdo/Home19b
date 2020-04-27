@@ -6,10 +6,10 @@ spring:
     date-format: dd/MM/yyyy
   data:
     mongodb:
-      database: admin
-      host: 45.76.182.215
-      password: 3ylqG|lWr8aq07x
-      username: admin
+      database: nha19b
+      host: 202.182.115.206
+      password: QA&=2I16GB&%*hU
+      username: nha19b
       port: 27017
 server:
   port: 8686

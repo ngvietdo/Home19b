@@ -59,7 +59,7 @@ public class QuanLyChiTieuService {
         return response;
     }
 
-    public BaseResponse getInfoCheckIn(ThongTinCheckInRequest request) {
+    public BaseResponse getInfoCheckIn(ThongTinCheckInRequest request) throws ParseException {
         GetArrayResponse response = new GetArrayResponse();
         if (request == null || request.isInvalid()) {
             response.setParamsInvalid();
@@ -341,7 +341,7 @@ public class QuanLyChiTieuService {
         return result;
     }
 
-    public List<DetailResponse> detailSreach(FilterGhiChuRequest request) {
+    public List<DetailResponse> detailSreach(FilterGhiChuRequest request) throws ParseException {
         String sdt = request.getSdt();
         ThongTinCheckInRequest requestCheckin = new ThongTinCheckInRequest(request.getTuNgay(), request.getDenNgay());
         List<DetailResponse> responses = new ArrayList<>();

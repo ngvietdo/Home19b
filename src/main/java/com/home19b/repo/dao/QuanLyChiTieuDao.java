@@ -1,20 +1,22 @@
 package com.home19b.repo.dao;
 
+import com.home19b.common.AppUtils;
 import com.home19b.common.CollectionMongoUtils;
 import com.home19b.domain.dto.CheckIn;
 import com.home19b.domain.dto.GhiChu;
 import com.home19b.domain.dto.User;
 import com.home19b.domain.request.CheckInOutRequest;
 import com.home19b.domain.request.ThongTinCheckInRequest;
-import com.home19b.domain.request.UpdateNoteRequest;
 import com.mongodb.BasicDBObject;
 import com.mongodb.Block;
 import com.mongodb.client.model.Filters;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.joda.time.LocalDate;
 import org.springframework.stereotype.Repository;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,24 +48,40 @@ public class QuanLyChiTieuDao extends BaseDao {
         return result;
     }
 
-    public List<CheckIn> getInfoCheckIn(ThongTinCheckInRequest request) {
+    public List<CheckIn> getInfoCheckIn(ThongTinCheckInRequest request) throws ParseException {
         List<CheckIn> result = new ArrayList<>();
+        //
+        List<String> lstNgay = new ArrayList<>();
+        LocalDate dateBefore = LocalDate.fromDateFields(AppUtils.parseDate(request.getTuNgay(), AppUtils.DATE_ONLY_PATTERN));
+        LocalDate dateAfter = LocalDate.fromDateFields(AppUtils.parseDate(request.getDenNgay(), AppUtils.DATE_ONLY_PATTERN));
+        while (!dateBefore.isAfter(dateAfter)) {
+            String dateCur = AppUtils.formatDate(dateBefore.toDate(), AppUtils.DATE_ONLY_PATTERN);
+            lstNgay.add(dateCur);
+            dateBefore = dateBefore.plusDays(1);
+        }
+        //
         getCollection(CollectionMongoUtils.CLT_CHECKIN, CheckIn.class)
-                .find(Filters.and(
-                        Filters.gte("ngayCheckIn", request.getTuNgay()),
-                        Filters.lte("ngayCheckIn", request.getDenNgay())
+                .find(Filters.in("ngayCheckIn", lstNgay
                 )).forEach((Block<? super CheckIn>) document -> {
             result.add(document);
         });
         return result;
     }
 
-    public List<GhiChu> getInfoGhiChu(ThongTinCheckInRequest request) {
+    public List<GhiChu> getInfoGhiChu(ThongTinCheckInRequest request) throws ParseException {
         List<GhiChu> result = new ArrayList<>();
+        //
+        List<String> lstNgay = new ArrayList<>();
+        LocalDate dateBefore = LocalDate.fromDateFields(AppUtils.parseDate(request.getTuNgay(), AppUtils.DATE_ONLY_PATTERN));
+        LocalDate dateAfter = LocalDate.fromDateFields(AppUtils.parseDate(request.getDenNgay(), AppUtils.DATE_ONLY_PATTERN));
+        while (!dateBefore.isAfter(dateAfter)) {
+            String dateCur = AppUtils.formatDate(dateBefore.toDate(), AppUtils.DATE_ONLY_PATTERN);
+            lstNgay.add(dateCur);
+            dateBefore = dateBefore.plusDays(1);
+        }
+        //
         getCollection(CollectionMongoUtils.CLT_GHICHU, GhiChu.class)
-                .find(Filters.and(
-                        Filters.gte("ngayGhiChu", request.getTuNgay()),
-                        Filters.lte("ngayGhiChu", request.getDenNgay())
+                .find(Filters.in("ngayGhiChu", lstNgay
                 )).forEach((Block<? super GhiChu>) document -> {
             result.add(document);
         });
@@ -98,7 +116,7 @@ public class QuanLyChiTieuDao extends BaseDao {
         document.append("ngayCheckIn", date);
         document.append("buoi", 1);
         document.append("isEat", 0);
-        document.append("chucVuName",user.getChucVuName());
+        document.append("chucVuName", user.getChucVuName());
         return document;
     }
 
@@ -109,7 +127,7 @@ public class QuanLyChiTieuDao extends BaseDao {
         document.append("ngayCheckIn", date);
         document.append("buoi", 2);
         document.append("isEat", 1);
-        document.append("chucVuName",user.getChucVuName());
+        document.append("chucVuName", user.getChucVuName());
         return document;
     }
 }
